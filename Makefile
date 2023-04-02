@@ -10,7 +10,7 @@ HEADERS := $(shell find ./ -name '*.h')
 CFILES := $(shell find ./ -name '*.c')
 OBJECTS := $(CFILES:${SRC_DIR}/%.c=$(BUILD_DIR)/%.o)
 
-EXEC := ./http_client
+EXEC := ./minhttp
 
 all: ${EXEC}
 
@@ -25,7 +25,7 @@ clean:
 	rm -rf ${BUILD_DIR} ${EXEC}
 
 run: ${EXEC}
-	./$< 
+	./$< www.google.com
 
 debug: ${EXEC}
 	cgdb ./$< 

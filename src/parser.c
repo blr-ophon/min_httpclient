@@ -1,11 +1,5 @@
 #include "parser.h"
 
-int main(void){
-    struct parsed_url url;
-    parse_url(&url, "http://www.example.com:80/res/page1.php?user=bob#account");
-    free_url(&url);
-}
-
 void free_url(struct parsed_url *url){
     free(url->protocol);
     free(url->hostname);
@@ -28,6 +22,9 @@ void parse_url(struct parsed_url *url, char *url_str){
         memcpy(url->protocol, &url_str[current_index], prtc_size);
         current_index += prtc_size + 3; //protocol length + ://
         printf("Protocol: %s\n", url->protocol);
+    }else{
+        url->protocol = calloc(5, 1);
+        strncpy(url->protocol, "http", 5);
     }
 
 
@@ -69,6 +66,9 @@ void parse_url(struct parsed_url *url, char *url_str){
         }
         current_index += i +1;
         printf("Port: %s\n", url->port);
+    }else{
+        url->port = calloc(3, 1);
+        strncpy(url->port, "80", 3);
     }
 
 
@@ -80,11 +80,15 @@ void parse_url(struct parsed_url *url, char *url_str){
     }
     //NOTE: if implementing query string, check for '?' and handle it the same way
     if(path_start){
+        current_index --;   //to get the '/'
         int path_size = (uint64_t)(path_end - &url_str[current_index]);
         url->path= (char*) calloc(path_size+1, 1);
         memcpy(url->path, &url_str[current_index], path_size);
         current_index += path_size + 1;    //hostname length + :
         printf("Path: %s\n", url->path);
+    }else{
+        url->port = calloc(2, 1);
+        strncpy(url->port, "/", 2);
     }
 
 
