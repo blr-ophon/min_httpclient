@@ -1,46 +1,55 @@
 #include "parser.h"
 
 int main(void){
-    parse_url("http://www.example.com:80/res/page1.php?user=bob#account");
+    struct parsed_url url;
+    parse_url(&url, "http://www.example.com:80/res/page1.php?user=bob#account");
+    free_url(&url);
 }
 
-void parse_url(char *url){
-    struct parsed_url parsed_url;
-    memset(&parsed_url, 0, sizeof(struct parsed_url));
+void free_url(struct parsed_url *url){
+    free(url->protocol);
+    free(url->hostname);
+    free(url->port);
+    free(url->path);
+    free(url->hash);
+}
+
+void parse_url(struct parsed_url *url, char *url_str){
+    memset(url, 0, sizeof(struct parsed_url));
     int current_index = 0;
-    int url_len = strlen(url); 
+    int url_len = strlen(url_str); 
 
     //PROTOCOL
-    char *prtc_end = strstr(&url[current_index], "://");    //protocol end
+    char *prtc_end = strstr(&url_str[current_index], "://");    //protocol end
     if(prtc_end){
         //protocol = everything before
-        int prtc_size = (uint64_t)(prtc_end - &url[current_index]);
-        parsed_url.protocol = (char*) calloc(prtc_size+1, 1);
-        memcpy(parsed_url.protocol, &url[current_index], prtc_size);
+        int prtc_size = (uint64_t)(prtc_end - &url_str[current_index]);
+        url->protocol = (char*) calloc(prtc_size+1, 1);
+        memcpy(url->protocol, &url_str[current_index], prtc_size);
         current_index += prtc_size + 3; //protocol length + ://
-        printf("Protocol: %s\n", parsed_url.protocol);
+        printf("Protocol: %s\n", url->protocol);
     }
 
 
     //HOSTNAME
     //get hostname end
     char *hname_end = NULL;
-    char *port_start = strstr(&url[current_index], ":");    
-    char *path_start = strstr(&url[current_index], "/");   
+    char *port_start = strstr(&url_str[current_index], ":");    
+    char *path_start = strstr(&url_str[current_index], "/");   
     if(port_start){
         hname_end = port_start;
     }else if(path_start){
         hname_end = path_start;
     }else{
-        hname_end = &url[url_len];
+        hname_end = &url_str[url_len];
     }
     //NOTE: if a url can have a hash and no path, just add the case here
 
-    int hname_size = (uint64_t)(hname_end - &url[current_index]);
-    parsed_url.hostname= (char*) calloc(hname_size+1, 1);
-    memcpy(parsed_url.hostname, &url[current_index], hname_size);
+    int hname_size = (uint64_t)(hname_end - &url_str[current_index]);
+    url->hostname= (char*) calloc(hname_size+1, 1);
+    memcpy(url->hostname, &url_str[current_index], hname_size);
     current_index += hname_size + 1;    //hostname length + :
-    printf("Hostname: %s\n", parsed_url.hostname);
+    printf("Hostname: %s\n", url->hostname);
 
 
     //PORT
@@ -49,42 +58,42 @@ void parse_url(char *url){
         char port_str[6] = {0}; //max port value is 65535
         int i = 0;
         for(; i < 6; i ++){
-            if(url[current_index + i] == '/'){
+            if(url_str[current_index + i] == '/'){
                 break;
             }
-            port_str[i] = url[current_index + i];
+            port_str[i] = url_str[current_index + i];
         }
         if(i != 0){
-            parsed_url.port = calloc(i+1, 1);
-            memcpy(parsed_url.port, port_str, i+1);
+            url->port = calloc(i+1, 1);
+            memcpy(url->port, port_str, i+1);
         }
         current_index += i +1;
-        printf("Port: %s\n", parsed_url.port);
+        printf("Port: %s\n", url->port);
     }
 
 
     //PATH
-    char *hash_start = strstr(&url[current_index], "#");
+    char *hash_start = strstr(&url_str[current_index], "#");
     char *path_end = hash_start;
     if(path_end == NULL){
-        path_end = &url[url_len];
+        path_end = &url_str[url_len];
     }
     //NOTE: if implementing query string, check for '?' and handle it the same way
     if(path_start){
-        int path_size = (uint64_t)(path_end - &url[current_index]);
-        parsed_url.path= (char*) calloc(path_size+1, 1);
-        memcpy(parsed_url.path, &url[current_index], path_size);
+        int path_size = (uint64_t)(path_end - &url_str[current_index]);
+        url->path= (char*) calloc(path_size+1, 1);
+        memcpy(url->path, &url_str[current_index], path_size);
         current_index += path_size + 1;    //hostname length + :
-        printf("Path: %s\n", parsed_url.path);
+        printf("Path: %s\n", url->path);
     }
 
 
     //HASH
     if(hash_start){
-        int hash_size = (uint64_t)(&url[url_len] - &url[current_index]);
-        parsed_url.hash= (char*) calloc(hash_size+1, 1);
-        memcpy(parsed_url.hash, &url[current_index], hash_size);
-        printf("hash: %s\n", parsed_url.hash);
+        int hash_size = (uint64_t)(&url_str[url_len] - &url_str[current_index]);
+        url->hash= (char*) calloc(hash_size+1, 1);
+        memcpy(url->hash, &url_str[current_index], hash_size);
+        printf("hash: %s\n", url->hash);
     }
 }
 

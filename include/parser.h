@@ -22,6 +22,8 @@ struct parsed_url{
     char *hash;
 };
 
-void parse_url(char *url);
+void parse_url(struct parsed_url *url, char *url_str);
+
+void free_url(struct parsed_url *url);
 
 #endif
