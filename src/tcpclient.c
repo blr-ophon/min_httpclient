@@ -30,7 +30,7 @@ int main(int argc, char *argv[]){
     freeaddrinfo(addresses);
 
     char send_msg_buf[4096] = {0};
-    char recv_msg_buf[4096 + 32 + 16 + 5] = {0};
+    char recv_msg_buf[4096] = {0};
 
     struct timeval timeout;
     timeout.tv_sec = 0;
@@ -62,8 +62,12 @@ int main(int argc, char *argv[]){
         }
 
         if(FD_ISSET(0, &cpy_fds)){
-            //prompt for message
-            fgets(send_msg_buf, sizeof(send_msg_buf), stdin);
+            //prompt for method
+            char method[10];
+            fgets(method, sizeof(method), stdin);
+            method[strlen(method)-1] = '\0';    //remove \n
+            httpmsg_setHeader(&url, method, send_msg_buf);
+
             int bytes_sent = send(sockfd, send_msg_buf, strlen(send_msg_buf), 0);
             if(bytes_sent == -1){
                 perror("recv");

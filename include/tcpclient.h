@@ -12,6 +12,7 @@
 #include <unistd.h>
 
 #include "parser.h"
+#include "httpmsg.h"
 
 int try_connection(struct addrinfo *const addresses);
 
