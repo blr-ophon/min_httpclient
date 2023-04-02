@@ -87,8 +87,8 @@ void parse_url(struct parsed_url *url, char *url_str){
         current_index += path_size + 1;    //hostname length + :
         printf("Path: %s\n", url->path);
     }else{
-        url->port = calloc(2, 1);
-        strncpy(url->port, "/", 2);
+        url->path = calloc(2, 1);
+        strncpy(url->path, "/", 2);
     }
 
 
