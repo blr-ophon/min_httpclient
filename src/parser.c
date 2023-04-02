@@ -63,5 +63,28 @@ void parse_url(char *url){
 
 
     //PATH
+    char *path_end;
+    char *hash_start = strstr(&url[current_index], "#");
+    if(hash_start == NULL){
+        path_end = &url[url_len];
+    }
+    //NOTE: if implementing query string, check for '?' and handle it the same way
+    if(path_start){
+        int path_size = (uint64_t)(path_end - &url[current_index]);
+        parsed_url.path= (char*) calloc(path_size+1, 1);
+        memcpy(parsed_url.path, &url[current_index], path_size);
+        current_index += path_size + 1;    //hostname length + :
+        printf("Path: %s\n", parsed_url.path);
+    }
+
+
+    //HASH
+    if(hash_start){
+        int hash_size = (uint64_t)(&url[url_len] - &url[current_index]);
+        parsed_url.hash= (char*) calloc(hash_size+1, 1);
+        memcpy(parsed_url.hash, &url[current_index], hash_size);
+        current_index += hash_size + 1;    //hostname length + :
+        printf("hash: %s\n", parsed_url.hash);
+    }
 }
 
