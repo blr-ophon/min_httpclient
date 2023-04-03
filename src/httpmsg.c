@@ -52,10 +52,13 @@ void httpmsg_handleResponse(char *response, struct parsed_url *url){
     //handle header
     httpmsg_handleHeaders(header, &resp_msg);
     if(resp_msg.flags & RFLAGS_CHANGED_LOC){
-        //change query location and resend
+        //TODO:
+        //change parsed url
+        //inform callee to connect to new url
     }
 
-    //TODO: must free resp_msg strings
+    printf("%s\n%s\n%d\n%x\n", resp_msg.content_type, resp_msg.new_loc,
+            resp_msg.body_length, resp_msg.flags);
     httpmsg_free(&resp_msg);
 }
 
@@ -77,18 +80,13 @@ void httpmsg_handleHeaders(char *header, struct httpmsg *httpmsg){
     char *respcodePtr = &header[9];     //expected after "HTTP/x.x "
     if(strstr(header, "301") == respcodePtr){
         httpmsg->flags |= RFLAGS_CHANGED_LOC;
-        char *location = strstr(header, "Location: ");
-        if(location == NULL){
-        }
     }
     if(strstr(header, "307") == respcodePtr){
         httpmsg->flags |= RFLAGS_CHANGED_LOC;
-        char *location = strstr(header, "Location: ");
-        if(location == NULL){
-        }
     }
 
     //FIELDS
+    
     char *offset = NULL;
 
     if((offset = strstr(header, "Location: ")) != NULL){
@@ -102,14 +100,14 @@ void httpmsg_handleHeaders(char *header, struct httpmsg *httpmsg){
 
     if((offset = strstr(header, "Content-Length: ")) != NULL){
         char value_buf[100];
-        int field_value_len = httpmsg_getFieldValue(offset, "Location :", value_buf);
+        int field_value_len = httpmsg_getFieldValue(offset, "Content-Length:", value_buf);
         if(field_value_len > 0){
             httpmsg->body_length = strtol(value_buf, NULL, 10);
         }
     }
 
 
-    if(strstr(header, "Transfer-encoding: chunked") != NULL){
+    if(strstr(header, "Transfer-Encoding: chunked") != NULL){
         httpmsg->flags |= RFLAGS_CHUNKED;
     }
 }

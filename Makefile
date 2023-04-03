@@ -28,5 +28,5 @@ run: ${EXEC}
 	./$< www.google.com
 
 debug: ${EXEC}
-	cgdb --args ./$< www.google.com
+	cgdb --args ./$< www.example.com
 
