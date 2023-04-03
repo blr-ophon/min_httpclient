@@ -24,8 +24,8 @@ ${BUILD_DIR}/%.o: ${SRC_DIR}/%.c ${HEADERS}
 clean:
 	rm -rf ${BUILD_DIR} ${EXEC}
 
-run: ${EXEC}
-	./$< www.google.com
+testrun: ${EXEC}
+	./$< www.example.com
 
 debug: ${EXEC}
 	cgdb --args ./$< www.example.com

@@ -47,7 +47,7 @@ void httpmsg_handleResponse(char *response, struct parsed_url *url){
 
     struct httpmsg resp_msg;
     memset(&resp_msg, 0, sizeof(struct httpmsg));
-    printf("%s\n", header);
+    //printf("%s\n", header);
 
     //handle header
     httpmsg_handleHeaders(header, &resp_msg);
@@ -57,8 +57,10 @@ void httpmsg_handleResponse(char *response, struct parsed_url *url){
         //inform callee to connect to new url
     }
 
+    /*
     printf("%s\n%s\n%d\n%x\n", resp_msg.content_type, resp_msg.new_loc,
             resp_msg.body_length, resp_msg.flags);
+    */
     httpmsg_free(&resp_msg);
 }
 
@@ -87,6 +89,7 @@ void httpmsg_handleHeaders(char *header, struct httpmsg *httpmsg){
 
     //FIELDS
     
+    //TODO: add content type
     char *offset = NULL;
 
     if((offset = strstr(header, "Location: ")) != NULL){
