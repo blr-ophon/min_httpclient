@@ -29,12 +29,15 @@ int main(int argc, char *argv[]){
     }
     freeaddrinfo(addresses);
 
-    char send_msg_buf[4096] = {0};
-    char recv_msg_buf[4096] = {0};
+    char send_msg_buf[8182] = {0};
+    char recv_msg_buf[8192] = {0};      //to receive each individual packet received
+
+    char *full_recv_msg = NULL;         //to store complete message from arrived packets
+    int received_count = 0;
 
     struct timeval timeout;
     timeout.tv_sec = 0;
-    timeout.tv_usec = 100000;
+    timeout.tv_usec = 200000;
 
     fd_set readfds;
     FD_ZERO(&readfds);
@@ -53,11 +56,27 @@ int main(int argc, char *argv[]){
             int recv_bytes = recv(sockfd, recv_msg_buf, sizeof(recv_msg_buf), 0);
             recv_msg_buf[recv_bytes] = '\0';
             if(recv_bytes < 1){
-                printf("Server connection closed");
+                printf("\nServer connection closed\n");
                 FD_CLR(sockfd, &readfds);
                 break;
             }else{
-                printf("> %s", recv_msg_buf);
+                int temp = received_count;
+                received_count += recv_bytes;
+                full_recv_msg = realloc(full_recv_msg, received_count);
+                memcpy(&full_recv_msg[temp], recv_msg_buf, recv_bytes);
+                //printf("%s", recv_msg_buf);
+
+
+
+                //1) Extract header (if it has)
+                //      -- A function to extratct header and put it in a buf and return body offset
+                //2) Write everything after header to a body buffer
+                //3) If message has no header, write it to buffer also
+                //4) After message has been completely received, check header parameters to interpret 
+                //      the content in the body buffer.
+                //5) Based on content-type and length/chunked, store data on buffer to a File of x-type
+                //httpmsg_handleHeaders(send_msg_buf, recv_msg_buf, &url);
+                //break;
             }
         }
 
@@ -74,6 +93,9 @@ int main(int argc, char *argv[]){
             }
         }
     }
+    full_recv_msg[received_count] = '\0';
+    printf("%s\n", full_recv_msg);
+    free(full_recv_msg);
     close(sockfd);
 }
 
