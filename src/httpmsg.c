@@ -7,7 +7,7 @@ void httpmsg_setHeader(struct parsed_url *url, char *method, char *httpmsg){
     sprintf(httpmsg +strlen(httpmsg), "Connection: close\r\n");
     sprintf(httpmsg +strlen(httpmsg), "\r\n");
 
-    printf("--HEADER:\n%s\n", httpmsg);
+    printf("\n---Sending request:\n\n%s", httpmsg);
 }
 
 

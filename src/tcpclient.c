@@ -39,6 +39,8 @@ int main(int argc, char *argv[]){
     timeout.tv_sec = 0;
     timeout.tv_usec = 200000;
 
+    printf("Enter Method: \n");
+
     fd_set readfds;
     FD_ZERO(&readfds);
     FD_SET(sockfd, &readfds);
@@ -56,7 +58,7 @@ int main(int argc, char *argv[]){
             int recv_bytes = recv(sockfd, recv_msg_buf, sizeof(recv_msg_buf), 0);
             recv_msg_buf[recv_bytes] = '\0';
             if(recv_bytes < 1){
-                printf("\nServer connection closed\n");
+                printf("\n---Server connection closed\n");
                 FD_CLR(sockfd, &readfds);
                 break;
             }else{
@@ -64,19 +66,6 @@ int main(int argc, char *argv[]){
                 received_count += recv_bytes;
                 full_recv_msg = realloc(full_recv_msg, received_count);
                 memcpy(&full_recv_msg[temp], recv_msg_buf, recv_bytes);
-                //printf("%s", recv_msg_buf);
-
-
-
-                //1) Extract header (if it has)
-                //      -- A function to extratct header and put it in a buf and return body offset
-                //2) Write everything after header to a body buffer
-                //3) If message has no header, write it to buffer also
-                //4) After message has been completely received, check header parameters to interpret 
-                //      the content in the body buffer.
-                //5) Based on content-type and length/chunked, store data on buffer to a File of x-type
-                //httpmsg_handleHeaders(send_msg_buf, recv_msg_buf, &url);
-                //break;
             }
         }
 
@@ -94,7 +83,7 @@ int main(int argc, char *argv[]){
         }
     }
     full_recv_msg[received_count] = '\0';
-    printf("%s\n", full_recv_msg);
+    printf("\n---Received response:\n\n%s\n", full_recv_msg);
 
     httpmsg_handleResponse(full_recv_msg, &url);
 
@@ -129,7 +118,7 @@ int try_connection(struct addrinfo *const addresses){
         return -1;
     }
     
-    printf("Connection established!\n");
+    printf("---Connection established!\n");
     return sockfd;
 }
 
