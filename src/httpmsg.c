@@ -61,6 +61,12 @@ void httpmsg_handleResponse(char *response, struct parsed_url *url){
     printf("%s\n%s\n%d\n%x\n", resp_msg.content_type, resp_msg.new_loc,
             resp_msg.body_length, resp_msg.flags);
     */
+
+    FILE *f = fopen("response.dat", "w+");
+    if(!(resp_msg.flags & RFLAGS_CHUNKED)){ //if not in chunked format
+        char *offset = &response[header_size];
+        fwrite(offset, sizeof(char), resp_msg.body_length, f);
+    }
     httpmsg_free(&resp_msg);
 }
 
