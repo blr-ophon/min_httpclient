@@ -81,6 +81,8 @@ void httpmsg_handleResponse(char *response, struct parsed_url *url){
                 chunk_size = strtol(offset, NULL, 16);
             }
         }
+
+        printf("\n\n> Data copied to response.dat\n");
     }
     httpmsg_free(&resp_msg);
 }
