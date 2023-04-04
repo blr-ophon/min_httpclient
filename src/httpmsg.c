@@ -55,6 +55,7 @@ void httpmsg_handleResponse(char *response, struct parsed_url *url){
         //TODO:
         //change parsed url
         //inform callee to connect to new url
+        //when protocol = https, must change default port
     }
 
     /*
@@ -63,9 +64,19 @@ void httpmsg_handleResponse(char *response, struct parsed_url *url){
     */
 
     FILE *f = fopen("response.dat", "w+");
+    char *offset = &response[header_size];
     if(!(resp_msg.flags & RFLAGS_CHUNKED)){ //if not in chunked format
-        char *offset = &response[header_size];
         fwrite(offset, sizeof(char), resp_msg.body_length, f);
+    }else{
+        size_t chunk_size = strtol(offset, NULL, 16);
+        while(chunk_size != 0){
+            //offset to chunk start
+            offset += field_strlen(offset) + 2;  //string until \r + "\r\n"
+            fwrite(offset, sizeof(char), chunk_size, f);
+            //offset to next chunk size
+            offset += chunk_size + 2;   //chunk + \r\n
+            chunk_size = strtol(offset, NULL, 16);
+        }
     }
     httpmsg_free(&resp_msg);
 }
