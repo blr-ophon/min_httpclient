@@ -39,7 +39,7 @@ void httpmsg_handleResponse(char *response, struct parsed_url *url){
 
     //extract header
     char header[2048]; 
-    int header_size = httpmsg_extractHeader(response, header);
+    int header_size = httpmsg_extractHeader(response, header);  //includes \r\n\r\n end
     if(header_size <= 0){    //if header doesn't exist
         //Do nothing, just receive the message
         return;
@@ -63,19 +63,23 @@ void httpmsg_handleResponse(char *response, struct parsed_url *url){
             resp_msg.body_length, resp_msg.flags);
     */
 
-    FILE *f = fopen("response.dat", "w+");
-    char *offset = &response[header_size];
-    if(!(resp_msg.flags & RFLAGS_CHUNKED)){ //if not in chunked format
-        fwrite(offset, sizeof(char), resp_msg.body_length, f);
-    }else{
-        size_t chunk_size = strtol(offset, NULL, 16);
-        while(chunk_size != 0){
-            //offset to chunk start
-            offset += field_strlen(offset) + 2;  //string until \r + "\r\n"
-            fwrite(offset, sizeof(char), chunk_size, f);
-            //offset to next chunk size
-            offset += chunk_size + 2;   //chunk + \r\n
-            chunk_size = strtol(offset, NULL, 16);
+    if(resp_msg.body_length > 0 || (resp_msg.flags & RFLAGS_CHUNKED)){ //not empty body
+        //Handle body. TODO: create another function for this
+        char *offset = &response[header_size];
+        FILE *f = fopen("response.dat", "w+");
+        if(!(resp_msg.flags & RFLAGS_CHUNKED)){ //if not in chunked format
+            fwrite(offset, sizeof(char), resp_msg.body_length, f);
+
+        }else{
+            size_t chunk_size = strtol(offset, NULL, 16);
+            while(chunk_size != 0){
+                //offset to chunk start
+                offset += field_strlen(offset) + 2;  //string until \r + "\r\n"
+                fwrite(offset, sizeof(char), chunk_size, f);
+                //offset to next chunk size
+                offset += chunk_size + 2;   //chunk + \r\n
+                chunk_size = strtol(offset, NULL, 16);
+            }
         }
     }
     httpmsg_free(&resp_msg);
@@ -94,6 +98,7 @@ int httpmsg_getFieldValue(char *offset, char *field_name, char *value_buf){
     return field_value_len;
 }
 
+//sets values and flags in httpmsg to be interpreted and used by the program in body handling
 void httpmsg_handleHeaders(char *header, struct httpmsg *httpmsg){
     //RESPONSE CODES
     char *respcodePtr = &header[9];     //expected after "HTTP/x.x "
@@ -144,15 +149,3 @@ size_t field_strlen(char *field){
     return i;
 }
 
-/*
-//interpretation of body based on header
-if(strstr(header, "Transfer-Encoding: chunked")){
-    char *offset = &response[header_size];
-    size_t len = strtol(offset, NULL, 16);  //reads string in base 16
-    len = 1000;
-    *body = (char*) malloc(len+1);
-    memcpy(*body, offset, len);
-    (*body)[len+1] = 0;
-
-}
-*/
