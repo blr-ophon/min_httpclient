@@ -15,7 +15,8 @@ EXEC := ./minhttp
 
 
 #HTTP Handler Library
-HHL_O := $(shell find ${BUILD_DIR}/http_hl -name '*.o')
+HHL_C := $(shell find ${SRC_DIR}/http_hl -name '*.c')
+HHL_O := $(HHL_C:${SRC_DIR}/%.c=$(BUILD_DIR)/%.o)
 HHL_LIB := ./hhl.so
 
 
