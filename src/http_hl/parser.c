@@ -24,8 +24,8 @@ void parse_url(struct parsed_url *url, char *url_str){
         printf("Protocol: %s\n", url->protocol);
     }else{
         //Default protocol is https, which is more common
-        url->protocol = calloc(5, 1);
-        strncpy(url->protocol, "https", 5);
+        url->protocol = calloc(6, 1);
+        strncpy(url->protocol, "https", 6);
     }
 
 
