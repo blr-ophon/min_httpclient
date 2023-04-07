@@ -16,7 +16,7 @@ int main(int argc, char *argv[]){
     hints.ai_socktype = SOCK_STREAM;
 
     struct addrinfo *addresses = NULL;
-    int rv = getaddrinfo(url.hostname, url.port, &hints, &addresses);
+    int rv = getaddrinfo(url.hostname, "80", &hints, &addresses);
     if(rv < 0){
         printf("getaddrinfo: %s\n", gai_strerror(rv));
         return -1;
