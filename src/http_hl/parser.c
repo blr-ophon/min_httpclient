@@ -23,8 +23,9 @@ void parse_url(struct parsed_url *url, char *url_str){
         current_index += prtc_size + 3; //protocol length + ://
         printf("Protocol: %s\n", url->protocol);
     }else{
+        //Default protocol is https, which is more common
         url->protocol = calloc(5, 1);
-        strncpy(url->protocol, "http", 5);
+        strncpy(url->protocol, "https", 5);
     }
 
 
@@ -67,8 +68,15 @@ void parse_url(struct parsed_url *url, char *url_str){
         current_index += i +1;
         printf("Port: %s\n", url->port);
     }else{
-        url->port = calloc(3, 1);
-        strncpy(url->port, "80", 3);
+        //If port is not defined, use default for http(80) or https(443)
+        if(strstr(url->protocol, "https") && (strlen(url->protocol) == 5)){
+            url->port = calloc(4, 1);
+            strncpy(url->port, "443", 3);
+        }
+        if(strstr(url->protocol, "http") && (strlen(url->protocol) == 4)){
+            url->port = calloc(3, 1);
+            strncpy(url->port, "80", 3);
+        }
     }
 
 
