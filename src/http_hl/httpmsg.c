@@ -35,7 +35,7 @@ size_t httpmsg_extractHeader(char *response, char *header){
     return header_size;
 }
 
-void httpmsg_handleResponse(char *response, struct parsed_url *url){
+void httpmsg_handleResponse(char *response){
 
     //extract header
     char header[2048]; 

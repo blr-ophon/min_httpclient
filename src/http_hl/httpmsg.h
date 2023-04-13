@@ -26,7 +26,7 @@ void httpmsg_setHeader(struct parsed_url *url, char *method, char *httpmsg);
 
 size_t httpmsg_extractHeader(char *response, char *header);
 
-void httpmsg_handleResponse(char *response, struct parsed_url *url);
+void httpmsg_handleResponse(char *response);
 
 int httpmsg_getFieldValue(char *offset, char *field_name, char *value_buf);
 

@@ -85,7 +85,7 @@ int main(int argc, char *argv[]){
     full_recv_msg[received_count] = '\0';
     printf("\n---Received response:\n\n%s\n", full_recv_msg);
 
-    httpmsg_handleResponse(full_recv_msg, &url);
+    httpmsg_handleResponse(full_recv_msg);
 
     free(full_recv_msg);
     close(sockfd);
