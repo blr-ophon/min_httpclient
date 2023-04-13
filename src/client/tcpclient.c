@@ -33,7 +33,7 @@ int main(int argc, char *argv[]){
     char recv_msg_buf[8192] = {0};      //to receive each individual packet received
 
     char *full_recv_msg = NULL;         //to store complete message from arrived packets
-    int received_count = 0;
+    unsigned long received_count = 0;
 
     struct timeval timeout;
     timeout.tv_sec = 0;
@@ -64,6 +64,7 @@ int main(int argc, char *argv[]){
             }else{
                 int temp = received_count;
                 received_count += recv_bytes;
+                printf("--Received %d bytes\nTotal: %lu\n", recv_bytes, received_count);
                 full_recv_msg = realloc(full_recv_msg, received_count);
                 memcpy(&full_recv_msg[temp], recv_msg_buf, recv_bytes);
             }
