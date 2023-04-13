@@ -7,7 +7,7 @@
 //This struct is used to interpret headers in the response, to know how to
 //interpret the body data and if the query should be resent in another way 
 //i.e: missing header, change location.
-//
+
 //This is mostly used in response handling and in the transfer from buffer to file
 struct httpmsg{
     char *content_type;
@@ -31,6 +31,8 @@ void httpmsg_handleResponse(char *response);
 int httpmsg_getFieldValue(char *offset, char *field_name, char *value_buf);
 
 void httpmsg_handleHeaders(char *header, struct httpmsg *httpmsg);
+
+void httpmsg_getTypeSufix(struct httpmsg *msg, char *buf);
 
 void httpmsg_free(struct httpmsg *msg);
 

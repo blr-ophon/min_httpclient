@@ -66,7 +66,10 @@ void httpmsg_handleResponse(char *response){
     if(resp_msg.body_length > 0 || (resp_msg.flags & RFLAGS_CHUNKED)){ //not empty body
         //Handle body. TODO: create another function for this
         char *offset = &response[header_size];
-        FILE *f = fopen("response.dat", "w+");
+        char filename[64] = "./responses/response";
+        httpmsg_getTypeSufix(&resp_msg, &filename[strlen(filename)]);  //file type sufix
+
+        FILE *f = fopen(filename, "w+");
         if(!(resp_msg.flags & RFLAGS_CHUNKED)){ //if not in chunked format
             fwrite(offset, sizeof(char), resp_msg.body_length, f);
 
@@ -82,7 +85,7 @@ void httpmsg_handleResponse(char *response){
             }
         }
 
-        printf("\n\n> Data copied to response.dat\n");
+        printf("\n\n> Data copied to %s\n", filename);
     }
     httpmsg_free(&resp_msg);
 }
@@ -137,6 +140,38 @@ void httpmsg_handleHeaders(char *header, struct httpmsg *httpmsg){
     if(strstr(header, "Transfer-Encoding: chunked") != NULL){
         httpmsg->flags |= RFLAGS_CHUNKED;
     }
+
+
+    if((offset = strstr(header, "Content-Type: ")) != NULL){
+        char value_buf[100];
+        int field_value_len = httpmsg_getFieldValue(offset, "Content-Type: ", value_buf);
+        if(field_value_len > 0){
+            httpmsg->content_type = malloc(field_value_len);
+            memcpy(httpmsg->content_type , value_buf, field_value_len); 
+        }
+    }
+}
+
+void httpmsg_getTypeSufix(struct httpmsg *msg, char *buf){
+    if(!msg->content_type){
+        //unspecified type
+        strncpy(buf, ".dat", 5);
+        return;
+    }
+
+    char *offset = strstr(msg->content_type, "/");
+
+    if(offset){
+        buf[0] = '.'; 
+        int i = 1;
+        for(;;i++){ 
+            if(offset[i] == ';' || offset[i] == '\r' || offset[i] == '\n'){
+                break;
+            }
+            buf[i] = offset[i];
+        }
+        buf[i] = '\0';
+    }
 }
 
 void httpmsg_free(struct httpmsg *msg){
@@ -150,4 +185,7 @@ size_t field_strlen(char *field){
     for(; field[i] != '\r'; i++){}
     return i;
 }
+
+
+
 

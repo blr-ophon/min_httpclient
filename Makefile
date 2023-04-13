@@ -13,6 +13,7 @@ CFILES := $(shell find ./src -name '*.c')
 OBJECTS := $(CFILES:${SRC_DIR}/%.c=$(BUILD_DIR)/%.o)
 EXEC := ./minhttp
 
+RESPS_DIR := ./responses
 
 #HTTP Handler Library
 HHL_C := $(shell find ${SRC_DIR}/http_hl -name '*.c')
@@ -21,6 +22,7 @@ HHL_LIB := ./hhl.so
 
 
 all: ${EXEC} ${HHL_LIB}
+	mkdir -p ${RESPS_DIR}
 
 ${EXEC}: ${OBJECTS}
 	${CC} ${CFLAGS} ${INCLUDES} $^ -o $@
@@ -34,7 +36,7 @@ ${HHL_LIB}: ${HHL_O}
 
 
 clean:
-	rm -rf ${BUILD_DIR} ${EXEC} ${HHL_LIB}
+	rm -rf ${BUILD_DIR} ${EXEC} ${HHL_LIB} ${RESPS_DIR}
 
 testrun: ${EXEC}
 	./$< www.example.com
