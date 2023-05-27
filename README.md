@@ -2,7 +2,9 @@
 # Basic HTTP client
 
 A basic http client that parses a URL, sends GET and HEAD requests and parses and saves the response.
-Used as library in my HTTPS version.
+
+Used as library in my [HTTPS version](https://github.com/blr-ophon/min_httpsclient).
+
 Programmed entirely in C. Uses linux sockets API for TCP connection with the server.
 
 ## Building
@@ -16,14 +18,6 @@ Compile using:
 ```bash
   cd min_httpclient
   make
-```
-## Running
-
-Currently only executes a predefined topology
-Run the executable directly or use make:
-
-```bash
-  make testrun
 ```
 
 ## Usage
