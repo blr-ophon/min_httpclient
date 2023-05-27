@@ -3,6 +3,7 @@
 
 A basic http client that parses a URL, sends GET and HEAD requests and parses and saves the response.
 Used as library in my HTTPS version.
+Programmed entirely in C. Uses linux sockets API for TCP connection with the server.
 
 ## Building
 
